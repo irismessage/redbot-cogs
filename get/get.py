@@ -18,7 +18,7 @@ class GetCog(commands.Cog):
     qualifiers = {
         # 2: "DUBS",
         # 3: "TRIS",
-        4: "QUADS",
+        # 4: "QUADS",
         5: "QUINTS",
         6: "SEX",
         7: "SEPTS",
