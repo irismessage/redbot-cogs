@@ -1,7 +1,7 @@
 from typing import Optional
 
-from discord import Message
-from redbot.core import commands
+from discord import Member, Message
+from redbot.core import bank, commands
 
 
 class GetCog(commands.Cog):
@@ -49,6 +49,16 @@ class GetCog(commands.Cog):
         else:
             return self.qualifiers.get(consecutive_digits)
 
+    @staticmethod
+    async def bank_reward(member: Member, consecutive_digits: int):
+        reward_value = 10**consecutive_digits
+        balance = bank.get_balance(member)
+        new_balance = balance + reward_value
+        try:
+            await bank.set_balance(member, new_balance)
+        except bank.errors.BalanceTooHigh:
+            pass
+
     async def quints(self, message: Message, message_id: int):
         consecutive_digits = self.count_consecutive_digits(message_id)
 
@@ -56,8 +66,10 @@ class GetCog(commands.Cog):
         if qual is None:
             return
 
-        content = message.content[: self.content_truncate]
+        if isinstance(message.author, Member):
+            await self.bank_reward(message.author, consecutive_digits)
 
+        content = message.content[: self.content_truncate]
         await message.channel.send(
             f'{message.author.name} sent "{content}..." with Message ID: {message_id} (***{qual}***)'
         )
