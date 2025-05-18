@@ -138,10 +138,10 @@ class GetCog(commands.Cog):
                 await self.quints(message, message.id, ctx.channel)
 
                 count += 1
+                count_all += 1
                 if count % 1000 == 0:
                     await update_status()
 
-            count_all += count
             await update_status()
             await ctx.send(f"Loaded history in {c.mention}")
 
