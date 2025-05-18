@@ -1,5 +1,52 @@
-from redbot.core.commands import Cog
+from redbot.core import commands
+from discord import Message
 
 
-class GetCog(Cog):
-    pass
+class GetCog(commands.Cog):
+    gif_url = "https://giphy.com/gifs/2lQCCSp19EDAy5d7c7"
+    qualifiers = {
+        5: "QUINTS",
+        6: "SEX",
+        7: "SEPTS",
+    }
+
+    @staticmethod
+    def consecutive_digits(number: int) -> int:
+        digit = number % 10
+        consecutive = 1
+        while number > 9:
+            number //= 10
+            if number % 10 != digit:
+                break
+            consecutive += 1
+
+        return consecutive
+
+    @staticmethod
+    def truncate_str(string: str, length: int) -> str:
+        if len(string) <= length:
+            return string
+        else:
+            return string[:length]
+
+    async def quints(self, message: Message, message_id: int):
+        consecutive = self.consecutive_digits(message_id)
+
+        qual = self.qualifiers.get(consecutive)
+        if qual is None:
+            return
+
+        content = self.truncate_str(message.content, 5)
+
+        await message.channel.send(
+            f'{message.author.name} sent "{content}..." with Message ID: {message_id} (***{qual}***)'
+        )
+
+    @commands.Cog.listener()
+    async def on_message(self, message: Message):
+        await self.quints(message, message.id)
+
+    @commands.is_owner()
+    @commands.command(hidden=True)
+    async def test_quints(self, ctx: commands.Context, message_id: int):
+        await self.quints(ctx.message, message_id)
