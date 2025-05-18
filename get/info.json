@@ -1,0 +1,7 @@
+{
+    "author": "imcb (sgp10)",
+    "install_msg": "Check em",
+    "name": "Get",
+    "short": "Quints etc.",
+    "description": "Ping when a message id has consecutive trailing digits"
+}
