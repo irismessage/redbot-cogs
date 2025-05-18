@@ -9,6 +9,7 @@ class GetCog(commands.Cog):
         6: "SEX",
         7: "SEPTS",
     }
+    content_truncate = 5
 
     @staticmethod
     def consecutive_digits(number: int) -> int:
@@ -22,13 +23,6 @@ class GetCog(commands.Cog):
 
         return consecutive
 
-    @staticmethod
-    def truncate_str(string: str, length: int) -> str:
-        if len(string) <= length:
-            return string
-        else:
-            return string[:length]
-
     async def quints(self, message: Message, message_id: int):
         consecutive = self.consecutive_digits(message_id)
 
@@ -36,7 +30,7 @@ class GetCog(commands.Cog):
         if qual is None:
             return
 
-        content = self.truncate_str(message.content, 5)
+        content = message.content[:self.content_truncate]
 
         await message.channel.send(
             f'{message.author.name} sent "{content}..." with Message ID: {message_id} (***{qual}***)'
