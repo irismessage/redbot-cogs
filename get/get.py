@@ -128,13 +128,14 @@ class GetCog(commands.Cog):
             async def update_status():
                 await status_message.edit(content=f"Read {count} in {c.mention}")
 
-            async for message in c.history():
+            async for message in c.history(limit=None):
                 await self.quints(message, message.id, ctx.channel)
 
                 count += 1
                 if count % 1000 == 0:
                     await update_status()
 
+            await update_status()
             await ctx.send(f"Loaded history in {c.mention}")
 
         await ctx.send("Loaded all history")
