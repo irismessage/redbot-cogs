@@ -1,5 +1,5 @@
-from redbot.core import commands
 from discord import Message
+from redbot.core import commands
 
 
 class GetCog(commands.Cog):
@@ -30,7 +30,7 @@ class GetCog(commands.Cog):
         if qual is None:
             return
 
-        content = message.content[:self.content_truncate]
+        content = message.content[: self.content_truncate]
 
         await message.channel.send(
             f'{message.author.name} sent "{content}..." with Message ID: {message_id} (***{qual}***)'
