@@ -1,3 +1,5 @@
+from typing import Optional
+
 from discord import Message
 from redbot.core import commands
 
@@ -5,14 +7,24 @@ from redbot.core import commands
 class GetCog(commands.Cog):
     gif_url = "https://giphy.com/gifs/2lQCCSp19EDAy5d7c7"
     qualifiers = {
+        # 2: "DUBS",
+        # 3: "TRIS",
+        4: "QUADS",
         5: "QUINTS",
         6: "SEX",
         7: "SEPTS",
+        8: "OCTS",
     }
+    over = "WHAT THE FUCK?"
     content_truncate = 5
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.max_qualifier = max(self.qualifiers.keys())
+
     @staticmethod
-    def consecutive_digits(number: int) -> int:
+    def count_consecutive_digits(number: int) -> int:
         """
         >>> GetCog.consecutive_digits(55555)
         5
@@ -31,10 +43,16 @@ class GetCog(commands.Cog):
 
         return consecutive
 
-    async def quints(self, message: Message, message_id: int):
-        consecutive = self.consecutive_digits(message_id)
+    def get_qualifier(self, consecutive_digits: int) -> Optional[str]:
+        if consecutive_digits > self.max_qualifier:
+            return self.over
+        else:
+            return self.qualifiers.get(consecutive_digits)
 
-        qual = self.qualifiers.get(consecutive)
+    async def quints(self, message: Message, message_id: int):
+        consecutive_digits = self.count_consecutive_digits(message_id)
+
+        qual = self.get_qualifier(consecutive_digits)
         if qual is None:
             return
 
