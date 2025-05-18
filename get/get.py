@@ -94,6 +94,7 @@ class GetCog(commands.Cog):
         content = message.content[: self.content_truncate]
         await destination.send(
             f'{message.author.name} sent "{content}..." with Message ID: {message_id} (***{qual}***)'
+            f"\n{self.gif_url}"
         )
 
     @commands.Cog.listener()
