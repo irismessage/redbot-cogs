@@ -131,8 +131,8 @@ class GetCog(commands.Cog):
             count = 0
 
             async def update_status():
-                await update_status_all()
                 await status_message.edit(content=f"Read {count} in {c.mention}")
+                await update_status_all()
 
             async for message in c.history(limit=None):
                 await self.quints(message, message.id, ctx.channel)
