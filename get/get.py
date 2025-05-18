@@ -13,6 +13,14 @@ class GetCog(commands.Cog):
 
     @staticmethod
     def consecutive_digits(number: int) -> int:
+        """
+        >>> GetCog.consecutive_digits(55555)
+        5
+        >>> GetCog.consecutive_digits(155555)
+        5
+        >>> GetCog.consecutive_digits(1)
+        1
+        """
         digit = number % 10
         consecutive = 1
         while number > 9:
