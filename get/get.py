@@ -16,8 +16,8 @@ from redbot.core import bank, commands
 class GetCog(commands.Cog):
     gif_url = "https://giphy.com/gifs/2lQCCSp19EDAy5d7c7"
     qualifiers = {
-        2: "DUBS",
-        3: "TRIS",
+        # 2: "DUBS",
+        # 3: "TRIS",
         4: "QUADS",
         5: "QUINTS",
         6: "SEX",
