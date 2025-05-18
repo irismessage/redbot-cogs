@@ -113,7 +113,12 @@ class GetCog(commands.Cog):
             await ctx.send("not in a guild")
             return
 
-        await ctx.send("Loading all history")
+        status_message_all = await ctx.send("Loading all history")
+        count_all = 0
+
+        async def update_status_all():
+            await status_message_all.edit(content=f"Read {count_all} in total")
+
         channels = [*guild.channels, *guild.threads]
 
         for c in channels:
@@ -126,6 +131,7 @@ class GetCog(commands.Cog):
             count = 0
 
             async def update_status():
+                await update_status_all()
                 await status_message.edit(content=f"Read {count} in {c.mention}")
 
             async for message in c.history(limit=None):
@@ -135,6 +141,7 @@ class GetCog(commands.Cog):
                 if count % 1000 == 0:
                     await update_status()
 
+            count_all += count
             await update_status()
             await ctx.send(f"Loaded history in {c.mention}")
 
