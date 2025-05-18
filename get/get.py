@@ -1,7 +1,6 @@
 from typing import Optional
 
 from discord import (
-    ForumChannel,
     Member,
     Message,
     StageChannel,
@@ -10,6 +9,7 @@ from discord import (
     User,
     VoiceChannel,
 )
+from discord.abc import Messageable
 from redbot.core import bank, commands
 
 
@@ -71,7 +71,17 @@ class GetCog(commands.Cog):
         except bank.errors.BalanceTooHigh:
             pass
 
-    async def quints(self, message: Message, message_id: int):
+    async def quints(
+        self,
+        message: Message,
+        message_id: Optional[int] = None,
+        destination: Optional[Messageable] = None,
+    ):
+        if message_id is None:
+            message_id = message.id
+        if destination is None:
+            destination = message.channel
+
         consecutive_digits = self.count_consecutive_digits(message_id)
 
         qual = self.get_qualifier(consecutive_digits)
@@ -80,14 +90,15 @@ class GetCog(commands.Cog):
 
         await self.bank_reward(message.author, consecutive_digits)
 
+        # note: newlines included
         content = message.content[: self.content_truncate]
-        await message.channel.send(
+        await destination.send(
             f'{message.author.name} sent "{content}..." with Message ID: {message_id} (***{qual}***)'
         )
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
-        await self.quints(message, message.id)
+        await self.quints(message)
 
     @commands.is_owner()
     @commands.command(hidden=True)
@@ -99,7 +110,10 @@ class GetCog(commands.Cog):
     async def backfill_quints(self, ctx: commands.Context):
         guild = ctx.guild
         if guild is None:
+            await ctx.send("not in a guild")
             return
+
+        await ctx.send("Loading all history")
         channels = [*guild.channels, *guild.threads]
 
         for c in channels:
@@ -115,10 +129,12 @@ class GetCog(commands.Cog):
                 await status_message.edit(content=f"Read {count} in {c.mention}")
 
             async for message in c.history():
-                await self.quints(message, message.id)
+                await self.quints(message, message.id, ctx.channel)
 
                 count += 1
                 if count % 1000 == 0:
                     await update_status()
 
             await ctx.send(f"Loaded history in {c.mention}")
+
+        await ctx.send("Loaded all history")
