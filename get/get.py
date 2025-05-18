@@ -1,14 +1,23 @@
 from typing import Optional
 
-from discord import Member, Message, User
+from discord import (
+    ForumChannel,
+    Member,
+    Message,
+    StageChannel,
+    TextChannel,
+    Thread,
+    User,
+    VoiceChannel,
+)
 from redbot.core import bank, commands
 
 
 class GetCog(commands.Cog):
     gif_url = "https://giphy.com/gifs/2lQCCSp19EDAy5d7c7"
     qualifiers = {
-        # 2: "DUBS",
-        # 3: "TRIS",
+        2: "DUBS",
+        3: "TRIS",
         4: "QUADS",
         5: "QUINTS",
         6: "SEX",
@@ -84,3 +93,32 @@ class GetCog(commands.Cog):
     @commands.command(hidden=True)
     async def test_quints(self, ctx: commands.Context, message_id: int):
         await self.quints(ctx.message, message_id)
+
+    @commands.is_owner()
+    @commands.command(hidden=True)
+    async def backfill_quints(self, ctx: commands.Context):
+        guild = ctx.guild
+        if guild is None:
+            return
+        channels = [*guild.channels, *guild.threads]
+
+        for c in channels:
+            if not isinstance(c, (TextChannel, VoiceChannel, StageChannel, Thread)):
+                # no history
+                await ctx.send(f"Ignoring {c.mention}")
+                continue
+
+            status_message = await ctx.send(f"Loading history in {c.mention}")
+            count = 0
+
+            async def update_status():
+                await status_message.edit(content=f"Read {count} in {c.mention}")
+
+            async for message in c.history():
+                await self.quints(message, message.id)
+
+                count += 1
+                if count % 1000 == 0:
+                    await update_status()
+
+            await ctx.send(f"Loaded history in {c.mention}")
